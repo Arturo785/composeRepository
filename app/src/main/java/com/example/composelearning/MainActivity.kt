@@ -1,73 +1,101 @@
 package com.example.composelearning
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Bottom
+import androidx.compose.ui.Alignment.Companion.BottomStart
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import com.example.composelearning.ui.theme.ComposeLearningTheme
+import androidx.compose.ui.unit.sp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // columns run vertically
-        // rows run horizontally
         setContent {
-            Column(
+            val painter = painterResource(id = R.drawable.patricio)
+            val description = "Test description on compose"
+            val title = "Test description on compose"
+
+            Box(
                 modifier = Modifier
-                    // the changes are called sequentially
-                    .background(Color.Cyan)
-                    .fillMaxHeight(.5f)
-                    .width(300.dp) // this fills but does not overflow
-                    .border(5.dp, Color.Magenta)
-                    .padding(5.dp)
-                    .border(5.dp, Color.Red)
-                    .padding(5.dp)
-                    .border(5.dp, Color.Yellow)
-                    .padding(5.dp)
-                    .border(5.dp, Color.Green)
-                    .padding(5.dp)
-                //    .requiredWidth(600.dp) this fills and overflows
+                    .fillMaxWidth(0.5f)
+                    .padding(16.dp)
             ) {
-                Text(
-                    text = "Hello",
-                    modifier = Modifier.clickable {
-                        Toast.makeText(
-                            this@MainActivity, "clicked",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                ) // gives space but does not push items pos is x,y
-                Spacer(modifier = Modifier.height(50.dp)) // sets a space
-                Text(text = "world")
+                ImageCard(painter = painter, contentDescription = description, title = title)
             }
+
+
         }
     }
 }
 
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
 
-
-@Preview(showBackground = true)
 @Composable
-fun DefaultPreview() {
-    ComposeLearningTheme {
-        Greeting("Android")
+fun ImageCard(
+    painter: Painter,
+    contentDescription: String,
+    title: String,
+    modifier: Modifier = Modifier
+) {
+    // with box we can stack items in top of each other and also works as a container
+    // inside the box scope the fist item is the one that is on the first layer and the stack continues
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(15.dp),
+        elevation = 5.dp
+    ) {
+        Box(modifier = Modifier.height(200.dp)) {
+            Image(
+                modifier = Modifier.fillMaxSize(),
+                painter = painter,
+                contentDescription = contentDescription,
+                contentScale = ContentScale.Crop
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                Color.Black
+                            ),
+                            startY = 300f
+                        )
+                    )
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp)
+                    .align(alignment = BottomStart),
+                contentAlignment = BottomStart
+            ) {
+                Text(
+                    title,
+                    style = TextStyle(color = Color.White, fontSize = 16.sp)
+                )
+            }
+        }
     }
+
+
+    // we can stack boxes in order to give the desire effect to our components
 }
