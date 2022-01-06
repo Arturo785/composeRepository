@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -15,8 +16,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.composelearning.ui.theme.ComposeLearningTheme
 
 class MainActivity : ComponentActivity() {
@@ -25,49 +29,22 @@ class MainActivity : ComponentActivity() {
 
         // columns run vertically
         // rows run horizontally
+
+        // we also have items indexed
         setContent {
-            Column(
-                modifier = Modifier
-                    // the changes are called sequentially
-                    .background(Color.Cyan)
-                    .fillMaxHeight(.5f)
-                    .width(300.dp) // this fills but does not overflow
-                    .border(5.dp, Color.Magenta)
-                    .padding(5.dp)
-                    .border(5.dp, Color.Red)
-                    .padding(5.dp)
-                    .border(5.dp, Color.Yellow)
-                    .padding(5.dp)
-                    .border(5.dp, Color.Green)
-                    .padding(5.dp)
-                //    .requiredWidth(600.dp) this fills and overflows
-            ) {
-                Text(
-                    text = "Hello",
-                    modifier = Modifier.clickable {
-                        Toast.makeText(
-                            this@MainActivity, "clicked",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                ) // gives space but does not push items pos is x,y
-                Spacer(modifier = Modifier.height(50.dp)) // sets a space
-                Text(text = "world")
+            LazyColumn() {
+                items(500) {
+                    Text(
+                        text = "Item $it",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 24.dp)
+                    )
+                }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    ComposeLearningTheme {
-        Greeting("Android")
     }
 }
