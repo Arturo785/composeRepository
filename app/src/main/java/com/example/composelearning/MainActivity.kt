@@ -26,6 +26,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // to try to understand better the highOrder functions
+        val aaaa = doSomething { num, num2 -> num - num2 }
+        val aaaa2 = doSomething { num, num2 -> num + num2 }
+
         // columns run vertically
         // rows run horizontally
         setContent {
@@ -42,7 +46,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     color.value = it
                     // every time we touch the box the fun gets called and in here we
-                    // receive what was sent as param
+                    // receive what was set
                 }
 
                 Box(
@@ -75,7 +79,7 @@ fun ColorBox(modifier: Modifier = Modifier, updateColor: (color: Color) -> Unit)
                 Color.Red
             )
             .clickable {
-                // calls the fun that we passed to be executed and assigns the param value
+                // sets the value to be received ih the calling lambda
                 updateColor(
                     Color(
                         Random.nextFloat(),
@@ -86,5 +90,13 @@ fun ColorBox(modifier: Modifier = Modifier, updateColor: (color: Color) -> Unit)
             }
     )
 
+}
+
+fun doSomething(action: (num: Int, num2: Int) -> Int): Int {
+
+    var random = Random.nextInt(1, 20)
+
+    // the lambda used receives the value used in here
+    return action(random, 4)
 }
 
