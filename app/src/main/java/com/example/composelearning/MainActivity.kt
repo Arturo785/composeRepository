@@ -3,21 +3,22 @@ package com.example.composelearning
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.composelearning.ui.theme.ComposeLearningTheme
+import kotlinx.coroutines.DisposableHandle
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,49 +26,72 @@ class MainActivity : ComponentActivity() {
 
         // columns run vertically
         // rows run horizontally
+
+        // a side effect is a block of code that is called after every
+        // successful recomposition of the composable which sometimes we don't want
+
+
         setContent {
-            Column(
-                modifier = Modifier
-                    // the changes are called sequentially
-                    .background(Color.Cyan)
-                    .fillMaxHeight(.5f)
-                    .width(300.dp) // this fills but does not overflow
-                    .border(5.dp, Color.Magenta)
-                    .padding(5.dp)
-                    .border(5.dp, Color.Red)
-                    .padding(5.dp)
-                    .border(5.dp, Color.Yellow)
-                    .padding(5.dp)
-                    .border(5.dp, Color.Green)
-                    .padding(5.dp)
-                //    .requiredWidth(600.dp) this fills and overflows
-            ) {
-                Text(
-                    text = "Hello",
-                    modifier = Modifier.clickable {
-                        Toast.makeText(
-                            this@MainActivity, "clicked",
-                            Toast.LENGTH_SHORT
-                        ).show()
+
+            val scaffoldState = rememberScaffoldState()
+            val scope = rememberCoroutineScope()
+
+            Scaffold(scaffoldState = scaffoldState) {
+
+                // syntactic sugar to access the value by automatic
+                var counter by remember {
+                    mutableStateOf(0)
+                }
+
+                if (counter % 5 == 0 && counter != 0) {
+                    // this cancels the current coroutine and launches a new one when new
+                    // event received
+                    LaunchedEffect(key1 = scaffoldState.snackbarHostState) {
+                        scaffoldState.snackbarHostState.showSnackbar("Hello")
                     }
-                ) // gives space but does not push items pos is x,y
-                Spacer(modifier = Modifier.height(50.dp)) // sets a space
-                Text(text = "world")
+                }
+
+                Button(onClick = { counter++ }) {
+                    Text(text = "Click me $counter")
+                }
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
+var i = 0
 
-
-@Preview(showBackground = true)
 @Composable
-fun DefaultPreview() {
-    ComposeLearningTheme {
-        Greeting("Android")
+fun MyComposable(backPressedDispatcher: OnBackPressedDispatcher) {
+    //i++ this is a side effect and we should avoid it
+
+    val callback = remember {
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // do something
+            }
+        }
     }
+
+
+    // this cleans the used thing after every recomposition
+    // to avoid memory leaks
+    DisposableEffect(key1 = backPressedDispatcher) {
+        backPressedDispatcher.addCallback(callback)
+
+        onDispose {
+            callback.remove()
+        }
+    }
+
+    // this one is only called in success recomposition
+    SideEffect {
+        i++
+    }
+
+
+    Button(onClick = {}) {
+        Text(text = "Click me")
+    }
+
 }
