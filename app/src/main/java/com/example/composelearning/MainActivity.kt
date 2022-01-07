@@ -15,8 +15,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ChainStyle
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.ConstraintSet
+import androidx.constraintlayout.compose.Dimension
 import com.example.composelearning.ui.theme.ComposeLearningTheme
 
 class MainActivity : ComponentActivity() {
@@ -26,48 +31,48 @@ class MainActivity : ComponentActivity() {
         // columns run vertically
         // rows run horizontally
         setContent {
-            Column(
-                modifier = Modifier
-                    // the changes are called sequentially
-                    .background(Color.Cyan)
-                    .fillMaxHeight(.5f)
-                    .width(300.dp) // this fills but does not overflow
-                    .border(5.dp, Color.Magenta)
-                    .padding(5.dp)
-                    .border(5.dp, Color.Red)
-                    .padding(5.dp)
-                    .border(5.dp, Color.Yellow)
-                    .padding(5.dp)
-                    .border(5.dp, Color.Green)
-                    .padding(5.dp)
-                //    .requiredWidth(600.dp) this fills and overflows
+            val constraints = ConstraintSet {
+
+                // gives us a way to call and reference our composables
+                val greenBox = createRefFor("green_box")
+                val redBox = createRefFor("red_box")
+
+                val guideline = createGuidelineFromTop(0.5f)
+
+                constrain(greenBox) {
+                    top.linkTo(guideline) // to the middle of the screen
+                    start.linkTo(parent.start)
+                    width = Dimension.value(100.dp)
+                    height = Dimension.value(100.dp)
+                }
+
+                constrain(redBox) {
+                    top.linkTo(parent.top)
+                    start.linkTo(greenBox.end)
+                    width = Dimension.value(100.dp)
+                    height = Dimension.value(100.dp)
+                }
+
+                createHorizontalChain(greenBox, redBox, chainStyle = ChainStyle.Packed)
+
+            }
+
+            ConstraintLayout(
+                constraints,
+                modifier = Modifier.fillMaxSize()
             ) {
-                Text(
-                    text = "Hello",
-                    modifier = Modifier.clickable {
-                        Toast.makeText(
-                            this@MainActivity, "clicked",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                ) // gives space but does not push items pos is x,y
-                Spacer(modifier = Modifier.height(50.dp)) // sets a space
-                Text(text = "world")
+                Box(
+                    modifier = Modifier
+                        .background(Color.Green)
+                        .layoutId("green_box")
+                )
+
+                Box(
+                    modifier = Modifier
+                        .background(Color.Red)
+                        .layoutId("red_box")
+                )
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    ComposeLearningTheme {
-        Greeting("Android")
     }
 }
